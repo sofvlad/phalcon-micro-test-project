@@ -24,3 +24,13 @@
 .btn-toggle-nav a:focus {
     background-color: rgba(0, 0, 0, 0.1);
 }
+
+.categories-list a.active .btn {
+    color: rgba(0, 0, 0, .85);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.page-item-space:hover a {
+    cursor: default;
+    background-color: var(--bs-pagination-bg);
+}

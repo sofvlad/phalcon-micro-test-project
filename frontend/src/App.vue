@@ -1,19 +1,71 @@
-<script setup>
+<script>
 import { useApi } from './composables/useApi';
-import {onMounted, provide, ref, watch} from 'vue';
+import { computed } from 'vue';
 
-const { data: response, loading, error, fetchData } = useApi();
-const categories = ref([]);
+export default {
+  name: 'App',
+  data() {
+    return {
+      response: null,
+      loading: false,
+      error: null,
+      fetchData: null,
+      categories: []
+    }
+  },
+  computed: {
+    categoryList() {
+      return this.response?.data || [];
+    },
+    reactiveCategories() {
+      return computed(() => this.categories);
+    }
+  },
+  methods: {
+    async loadCategories() {
+      if (!this.fetchData) return;
 
-provide('categories', categories);
+      this.loading = true;
+      this.error = null;
 
-watch(response, (newCode) => {
-  categories.value = newCode?.data;
-});
+      try {
+        await this.fetchData('/category/list', 'POST');
+      } catch (err) {
+        this.error = err.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+    updateCategories(newVal) {
+      if (newVal?.data) {
+        this.categories = newVal.data;
+      }
+    }
+  },
+  watch: {
+    response: {
+      handler(newVal) {
+        this.updateCategories(newVal);
+      },
+      deep: true,
+      immediate: true
+    }
+  },
+  created() {
+    const { data, loading, error, fetchData } = useApi();
+    this.response = data;
+    this.loading = loading;
+    this.error = error;
+    this.fetchData = fetchData;
 
-onMounted(() => {
-  fetchData('/category/list', 'POST');
-});
+    this.loadCategories();
+  },
+  provide() {
+    return {
+      categories: this.reactiveCategories
+    }
+  }
+}
 </script>
 
 <template>
@@ -23,9 +75,9 @@ onMounted(() => {
         <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
           <span class="fs-2 fw-semibold">MARKET</span>
         </a>
-        <ul class="list-unstyled ps-0">
+        <ul class="categories-list list-unstyled ps-0">
           <li class="mb-1">
-            <router-link to="/">
+            <router-link to="/" active-class="active">
               <button class="btn btn-toggle align-items-center rounded collapsed">
                 Главная
               </button>
@@ -39,8 +91,8 @@ onMounted(() => {
           <li v-else-if="error" class="mb-1 text-danger">
             {{ error }}
           </li>
-          <li v-else v-for="category in response?.data" :key="category.code" class="mb-1">
-            <router-link :to="{ name: 'category_products', params: { code: category.code } }">
+          <li v-else v-for="category in categoryList" :key="category.code" class="mb-1">
+            <router-link :to="{ name: 'category_products', params: { code: category.code } }" active-class="active">
               <button class="btn btn-toggle align-items-center rounded collapsed">
                 {{ category.name }}
               </button>
