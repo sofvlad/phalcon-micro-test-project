@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
-use Core\Builder\Order;
 use Core\Exceptions\Exception;
-use Core\Exceptions\ValidateException;
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
 use Phalcon\Paginator\Adapter\QueryBuilder;
-use ReflectionException;
 
 class ProductController extends Controller
 {
     /**
-     * @throws ReflectionException
      * @throws Exception
      */
     public function list(): ResponseInterface
@@ -49,7 +46,11 @@ class ProductController extends Controller
      */
     public function view(int $id): ResponseInterface
     {
-        return $this->response->setJsonContent(Product::findFirst($id));
+        $product = Product::findFirst($id);
+        $result = $product->toArray();
+        $result['categories'] = array_column($product->getRelated(Category::class)->toArray(), 'id');
+
+        return $this->response->setJsonContent($result);
     }
 
     /**
@@ -57,22 +58,11 @@ class ProductController extends Controller
      */
     public function save(): ResponseInterface
     {
-        $request = $this->request;
+        $product = new ProductRepository($this->getDI())->save($this->request->getJsonRawBody(true));
+        $result = $product->toArray();
+        $result['categories'] = array_column($product->getRelated(Category::class)->toArray(), 'id');
 
-        $id = (int)$request->getPost('id');
-        if (!empty($id)) {
-            $product = Product::findFirst($id);
-        }
-        $product ??= (new Product());
-
-        $product->setId($id);
-        $product->setName($request->getPost('name', null, $product->getName()));
-        $product->setDescription($request->getPost('description', null, $product->getDescription()));
-        $product->setPrice((float)$request->getPost('price', null, $product->getPrice()));
-        $product->setInStock((bool)$request->getPost('in_stock', null, $product->getInStock()));
-        $product->save();
-
-        return $this->response->setJsonContent($product);
+        return $this->response->setJsonContent($result);
     }
 
     /**

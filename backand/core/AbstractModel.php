@@ -9,6 +9,27 @@ use Phalcon\Mvc\Model\Exception;
 
 abstract class AbstractModel extends Model implements ModelInterface
 {
+    protected ?string $primaryKey = null;
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function setPrimaryKey(string $name): static
+    {
+        $this->primaryKey = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPrimaryKey(): mixed
+    {
+        return $this->primaryKey;
+    }
+
     /**
      * @return void
      */
@@ -50,5 +71,10 @@ abstract class AbstractModel extends Model implements ModelInterface
         return ltrim(strtolower(
             preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', substr($method, $methodStartStrLen))
         ), '_');
+    }
+
+    public function setData(array $data): static
+    {
+
     }
 }

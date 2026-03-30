@@ -5,15 +5,10 @@ declare(strict_types=1);
 namespace Core;
 
 use Core\Builder\Order;
-use Core\Exceptions\EntityNotFoundException;
 use Core\Exceptions\Exception;
 use Phalcon\Mvc\Model;
 use Phalcon\Mvc\Model\Manager as ModelManager;
-use Phalcon\Mvc\Model\Resultset;
 use Phalcon\Mvc\Model\Query\BuilderInterface;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionProperty;
 
 abstract class AbstractRepository
 {
@@ -22,43 +17,39 @@ abstract class AbstractRepository
     }
 
     /**
-     * @return Model
+     * @return AbstractModel
      */
-    public function getModel(): Model
+    public function getModel(): AbstractModel
     {
         return new $this->modelClass();
     }
 
     /**
+     * @param Model|null $model
      * @return array
-     * @throws ReflectionException
      */
-    protected function getModelProperties(): array
+    protected function getModelProperties(?Model $model = null): array
     {
-        $properties = new ReflectionClass($this->modelClass)->getProperties(ReflectionProperty::IS_PUBLIC);
-
-        $result = [];
-        foreach ($properties as $property) {
-            $result[] = $property->name;
+        if ($model === null) {
+            $model = $this->getModel();
         }
 
-        return $result;
+        return $model->getModelsMetaData()->getAttributes($model);
     }
 
     /**
      * @param array $parameters
+     * @param Model|null $model
      * @return array
-     * @throws ReflectionException
      */
-    protected function filterParameters(array $parameters): array
+    protected function filterParameters(array $parameters, ?Model $model = null): array
     {
-        return array_intersect_key($parameters, array_flip($this->getModelProperties()));
+        return array_intersect_key($parameters, array_flip($this->getModelProperties($model)));
     }
 
     /**
      * @param array $parameters
      * @return BuilderInterface
-     * @throws ReflectionException
      * @throws Exception
      */
     public function getBuilder(array $parameters = []): BuilderInterface
@@ -96,47 +87,19 @@ abstract class AbstractRepository
     }
 
     /**
-     * @param array $parameters
-     * @return Resultset
-     * @throws EntityNotFoundException
-     * @throws ReflectionException
+     * @param array $data
+     * @return AbstractModel
      */
-    public function find(array $parameters): Resultset
+    public function save(array $data): AbstractModel
     {
         $model = $this->getModel();
-        $result = $model::find($this->filterParameters($parameters));
-        if (empty($result)) {
-            throw new EntityNotFoundException($model::class);
+        $data = $this->filterParameters($data, $model);
+        $primaryKeyVal = $data[$model->getPrimaryKey()];
+        if (!empty($primaryKeyVal)) {
+            $model = $model::findFirst($primaryKeyVal);
         }
+        $model->assign($data)->save();
 
-        return $result;
-    }
-
-    /**
-     * @param array $parameters
-     * @return Resultset
-     * @throws EntityNotFoundException
-     * @throws ReflectionException
-     */
-    public function findFirst(array $parameters): Resultset
-    {
-        $model = $this->getModel();
-        $result = $model::findFirst($this->filterParameters($parameters));
-        if (empty($result)) {
-            throw new EntityNotFoundException($model::class);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array $parameters
-     * @return bool
-     * @throws EntityNotFoundException
-     * @throws ReflectionException
-     */
-    public function delete(array $parameters): bool
-    {
-        return $this->findFirst($this->filterParameters($parameters))->delete();
+        return $model;
     }
 }

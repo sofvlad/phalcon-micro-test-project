@@ -35,6 +35,7 @@ class Category extends AbstractModel
     public function initialize(): void
     {
         $this->setSource('categories');
+        $this->setPrimaryKey('id');
 
         $this->hasManyToMany(
             'id',

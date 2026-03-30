@@ -61,6 +61,18 @@ return [
                     ],
                     [
                         'pattern' => '/{id}',
+                        'method'  => Method::GET,
+                        'handler'  => [CategoryController::class, 'view'],
+                        'name' => 'category.view',
+                    ],
+                    [
+                        'pattern' => '/',
+                        'method'  => Method::POST,
+                        'handler'  => [CategoryController::class, 'save'],
+                        'name' => 'category.save',
+                    ],
+                    [
+                        'pattern' => '/{id}',
                         'method'  => Method::DELETE,
                         'handler'  => [CategoryController::class, 'delete'],
                         'name' => 'category.delete',

@@ -35,6 +35,7 @@ class User extends AbstractModel
     public function initialize(): void
     {
         $this->setSource('users');
+        $this->setPrimaryKey('id');
 
         $this->addBehavior(
             new Timestampable([

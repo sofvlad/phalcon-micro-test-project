@@ -23,6 +23,10 @@ use Phalcon\Filter\Validation\Validator\StringLength;
  * @method void setPrice(float $value)
  * @method bool getInStock()
  * @method bool setInStock(bool $value)
+ * @method string getCreatedAt()
+ * @method void setCreatedAt(string $value)
+ * @method string getUpdatedAt()
+ * @method void setUpdatedAt(string $value)
  */
 class Product extends AbstractModel
 {
@@ -37,6 +41,16 @@ class Product extends AbstractModel
     public function initialize(): void
     {
         $this->setSource('products');
+        $this->setPrimaryKey('id');
+
+        $this->hasManyToMany(
+            'id',
+            CategoryProduct::class,
+            'product_id',
+            'category_id',
+            Category::class,
+            'id'
+        );
 
         $this->addBehavior(
             new Timestampable([

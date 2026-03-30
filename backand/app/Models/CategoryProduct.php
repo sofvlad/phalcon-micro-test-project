@@ -12,14 +12,10 @@ use Phalcon\Filter\Validation\Validator\PresenceOf;
 use Phalcon\Filter\Validation\Validator\StringLength;
 
 /**
- * @method int getId()
- * @method void setId(int $value)
- * @method string getName()
- * @method void setName(string $value)
- * @method string getDescription()
- * @method void setDescription(string $value)
- * @method string getCreatedAt()
- * @method void setCreatedAt(string $value)
+ * @method int getProductId()
+ * @method void setProductId(int $value)
+ * @method int getCategoryId()
+ * @method void setCategoryId(int $value)
  */
 class CategoryProduct extends AbstractModel
 {

@@ -7,11 +7,11 @@ namespace App\Repositories;
 use App\Models\Category;
 use App\Models\CategoryProduct;
 use App\Models\Product;
+use Core\AbstractModel;
 use Core\AbstractRepository;
 use Core\Exceptions\Exception;
 use Phalcon\Di\DiInterface;
 use Phalcon\Mvc\Model\Query\BuilderInterface;
-use ReflectionException;
 
 class ProductRepository extends AbstractRepository
 {
@@ -21,7 +21,6 @@ class ProductRepository extends AbstractRepository
     }
 
     /**
-     * @throws ReflectionException
      * @throws Exception
      */
     public function getBuilder(array $parameters = []): BuilderInterface
@@ -45,5 +44,47 @@ class ProductRepository extends AbstractRepository
         $qb->andWhere('t3.code = :category_code:', ['category_code' => $parameters['category']]);
 
         return $qb;
+    }
+
+    /**
+     * @param array $data
+     * @return AbstractModel
+     */
+    public function save(array $data): AbstractModel
+    {
+        /** @var Product $product */
+        $product = parent::save($data);
+        if (!isset($data['categories'])) {
+            return $product;
+        }
+        $categories = CategoryProduct::find([
+            'conditions' => 'product_id = :product_id:',
+            'bind'       => [
+                'product_id' => $product->getId(),
+            ],
+        ]);
+        $existIds = array_column($categories->toArray(), 'category_id');
+        $getIds = array_map('intval', array_filter($data['categories'], 'is_numeric'));
+        $getIds = array_values(array_unique($getIds));
+        $toAdd = array_diff($getIds, $existIds);
+        $toRemove = array_diff($existIds, $getIds);
+
+        foreach ($toRemove as $categoryId) {
+            CategoryProduct::findFirst([
+                'conditions' => 'product_id = :product_id: AND category_id = :category_id:',
+                'bind'       => [
+                    'product_id' => $product->getId(),
+                    'category_id' => $categoryId,
+                ],
+            ])->delete();
+        }
+        foreach ($toAdd as $categoryId) {
+            $categoryProduct = new CategoryProduct();
+            $categoryProduct->setCategoryId($categoryId);
+            $categoryProduct->setProductId($product->getId());
+            $categoryProduct->save();
+        }
+
+        return $product;
     }
 }

@@ -8,12 +8,8 @@ use App\Models\User;
 use App\Repositories\UserRepository;
 use Core\Exceptions\EntityNotFoundException;
 use Core\Exceptions\Exception;
-use Phalcon\Config\Config;
-use Phalcon\Encryption\Security;
 use Phalcon\Encryption\Security\JWT\Exceptions\UnsupportedAlgorithmException;
 use Phalcon\Encryption\Security\JWT\Exceptions\ValidatorException;
-use Phalcon\Encryption\Security\JWT\Builder as JWTBuilder;
-use Phalcon\Encryption\Security\JWT\Signer\Hmac;
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Mvc\Controller;
 
