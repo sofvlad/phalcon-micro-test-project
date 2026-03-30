@@ -77,6 +77,7 @@ POST http://localhost:8080/api/v1/user
 ```
 
 ### Получение продуктов
+**Запрос**
 ```
 POST http://localhost:8080/api/v1/product/list
 {
@@ -108,6 +109,71 @@ POST http://localhost:8080/api/v1/product/list
         ],
         "page": 1,
         "total": 141
+    }
+}
+```
+
+### Подробное получение данных о продукте
+**Запрос**
+```
+GET http://localhost:8080/api/v1/product/50
+```
+**Ответ**
+```
+{
+    "status": "success",
+    "data": {
+        "id": 50,
+        "name": "Eco Product 452",
+        "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+        "price": 924,
+        "in_stock": true,
+        "created_at": "2026-03-30 09:04:19",
+        "updated_at": "2026-03-30 17:41:17",
+        "categories": [
+            1,
+            4,
+            6
+        ]
+    }
+}
+```
+
+### Редактирование продукта
+Смена названия и удаления из категории
+**Запрос**
+```
+POST http://localhost:8080/api/v1/product
+{
+    "id": 50,
+    "name": "Eco Product 450",
+    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+    "price": 924,
+    "in_stock": true,
+    "created_at": "2026-03-30 09:04:19",
+    "updated_at": "2026-03-30 09:04:19",
+    "categories": [
+        1,
+        4
+    ]
+}
+```
+**Ответ**
+```
+{
+    "status": "success",
+    "data": {
+        "id": 50,
+        "name": "Eco Product 450",
+        "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+        "price": 924,
+        "in_stock": true,
+        "created_at": "2026-03-30 09:04:19",
+        "updated_at": "2026-03-30 18:06:22",
+        "categories": [
+            1,
+            4
+        ]
     }
 }
 ```
