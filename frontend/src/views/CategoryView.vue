@@ -149,6 +149,7 @@ export default {
   </div>
 
   <div v-else class="row g-4">
+    <p v-if="!products.length">Продуктов нет...</p>
     <div
         v-for="product in products"
         :key="product.id"
