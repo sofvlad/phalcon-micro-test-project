@@ -89,7 +89,7 @@ abstract class AbstractRepository
 
         $parameters = $this->filterParameters($parameters);
         foreach ($parameters as $param => $value) {
-            $qb->andWhere(sprintf('%s = :%s', $param, $param), [$param => $value]);
+            $qb->andWhere(sprintf('%s = :%s:', $param, $param), [$param => $value]);
         }
 
         return $qb;

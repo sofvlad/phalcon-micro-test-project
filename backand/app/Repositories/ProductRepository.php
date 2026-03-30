@@ -26,8 +26,10 @@ class ProductRepository extends AbstractRepository
      */
     public function getBuilder(array $parameters = []): BuilderInterface
     {
-        $qb = parent::getBuilder($parameters)
-            ->andWhere('t1.in_stock = :in_stock:', ['in_stock' => 1]);
+        if (isset($parameters['in_stock'])) {
+            $parameters['in_stock'] = !empty($parameters['in_stock']);
+        }
+        $qb = parent::getBuilder($parameters);
 
         if (empty($parameters['category'])) {
             return $qb;

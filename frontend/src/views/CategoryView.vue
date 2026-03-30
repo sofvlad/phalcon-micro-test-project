@@ -27,6 +27,7 @@ const fetchProductList = (code, page) => {
     page: page,
     limit: limit,
     category: code,
+    in_stock: true,
     order: {
       field: "name",
       dir: "ASC"

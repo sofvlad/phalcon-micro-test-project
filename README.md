@@ -15,7 +15,7 @@
 ## Сборка
 
 ```
-docker-compose up
+docker-compose up -d
 cd backend
 make init
 make init-seeds
@@ -42,6 +42,21 @@ backend/
 
 ## Пример запросов
 ### Авторизация пользователя
+**Запрос**
+```
+POST http://localhost:8080/api/v1/user/register
+{
+    "email": "test@test.com",
+    "password": "Test1234"
+}
+```
+**Ответ**
+```
+{
+    "status": "success",
+    "data": []
+}
+```
 **Запрос**
 ```
 POST http://localhost:8080/api/v1/user
@@ -86,8 +101,8 @@ POST http://localhost:8080/api/v1/product/list
                 "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
                 "price": 101,
                 "in_stock": true,
-                "created_at": "2026-03-29 15:57:39",
-                "updated_at": "2026-03-29 15:57:39"
+                "created_at": "2026-03-29 00:00:59",
+                "updated_at": "2026-03-29 00:00:59"
             },
             ...
         ],
