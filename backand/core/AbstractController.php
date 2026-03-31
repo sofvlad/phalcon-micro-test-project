@@ -24,9 +24,6 @@ abstract class AbstractController extends Controller
     protected function getCurrentUser(): ?array
     {
         $authHeader = $this->request->getHeader('Authorization');
-        if (empty($authHeader)) {
-            return null;
-        }
         if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
             throw new UnauthorizedException('Please provide a valid authentication token');
         }
