@@ -15,15 +15,17 @@ final class ExceptionResponse
     {
         $response = new Response();
         $response->setContentType('application/json', 'UTF-8');
-        $response->setStatusCode(500);
+        $exceptionCode = $exception->getCode() ?: 500;
+        $exceptionMessage = ($_ENV['DEBUG'] || $exception instanceof Exception)
+            ? $exception->getMessage()
+            : 'Internal server error';
         $responseContent = [
             'status' => 'error',
-            'code' => $exception->getCode(),
-            'message' => ($_ENV['DEBUG'] || $exception instanceof Exception)
-                ? $exception->getMessage()
-                : 'Internal server error',
+            'code' => $exceptionCode,
+            'message' => $exceptionMessage,
         ];
-        if ($exception instanceof Exception) {
+        $response->setStatusCode($exceptionCode, $exceptionMessage);
+        if ($exception instanceof Exception && !empty($exception->getData())) {
             $responseContent['data'] = $exception->getData();
         }
         if ($_ENV['DEBUG']) {

@@ -78,7 +78,7 @@ export default {
       }
 
       try {
-        await this.fetchData('/product/list', 'POST', JSON.stringify(body));
+        await this.fetchData('/product/list', 'POST', body);
       } catch (err) {
         this.error = err.message;
       } finally {

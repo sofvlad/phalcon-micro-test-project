@@ -8,6 +8,7 @@ use App\Models\User;
 use Core\AbstractRepository;
 use Core\Exceptions\EntityNotFoundException;
 use Core\Exceptions\Exception;
+use Core\Exceptions\UnauthorizedException;
 use Phalcon\Config\Config;
 use Phalcon\Di\DiInterface;
 use Phalcon\Encryption\Security;
@@ -37,22 +38,22 @@ class UserRepository extends AbstractRepository
      */
     public function auth(string $email, string $password): array
     {
+        if (empty($password)) {
+            throw new Exception('Password is not set');
+        }
         $user = User::findFirst([
             'conditions' => 'email = :email:',
             'bind' => [
                 'email' => $email,
             ],
         ]);
-        if ($user === null) {
-            throw new EntityNotFoundException(User::class);
-        }
 
-        if (empty($password)) {
-            throw new Exception('Password is not set');
+        if ($user === null) {
+            throw new UnauthorizedException('Email or password is not correct');
         }
         $checkPassword = new Security()->checkHash($password, $user->password);
         if (!$checkPassword) {
-            throw new EntityNotFoundException(User::class);
+            throw new UnauthorizedException('Email or password is not correct');
         }
 
         /** @var Config $config */
@@ -66,7 +67,7 @@ class UserRepository extends AbstractRepository
 
         $tokenObject = $builder
             ->setId(uniqid())
-            ->setSubject($email)
+            ->setSubject('user_' . $user->getId())
             ->setAudience($request->getHeader('referer') ?? $config->path('jwt.audience'))
             ->setIssuer($config->path('jwt.issuer'))
             ->setIssuedAt($now)

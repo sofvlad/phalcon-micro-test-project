@@ -7,12 +7,15 @@ namespace App\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
+use Core\AbstractController;
+use Core\Exceptions\EntityNotFoundException;
 use Core\Exceptions\Exception;
+use Core\Exceptions\UnauthorizedException;
+use Phalcon\Encryption\Security\JWT\Exceptions\UnsupportedAlgorithmException;
 use Phalcon\Http\ResponseInterface;
-use Phalcon\Mvc\Controller;
 use Phalcon\Paginator\Adapter\QueryBuilder;
 
-class ProductController extends Controller
+class ProductController extends AbstractController
 {
     /**
      * @throws Exception
@@ -55,9 +58,13 @@ class ProductController extends Controller
 
     /**
      * @return ResponseInterface
+     * @throws EntityNotFoundException
+     * @throws UnauthorizedException
+     * @throws UnsupportedAlgorithmException
      */
     public function save(): ResponseInterface
     {
+        $this->getCurrentUser();
         $product = new ProductRepository($this->getDI())->save($this->request->getJsonRawBody(true));
         $result = $product->toArray();
         $result['categories'] = array_column($product->getRelated(Category::class)->toArray(), 'id');
@@ -68,9 +75,13 @@ class ProductController extends Controller
     /**
      * @param int $id
      * @return ResponseInterface
+     * @throws EntityNotFoundException
+     * @throws UnauthorizedException
+     * @throws UnsupportedAlgorithmException
      */
     public function delete(int $id): ResponseInterface
     {
+        $this->getCurrentUser();
         Product::findFirst($id)->delete();
 
         return $this->response->setJsonContent([]);

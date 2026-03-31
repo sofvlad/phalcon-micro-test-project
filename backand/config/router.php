@@ -10,16 +10,27 @@ return [
         'prefix' => '/api/v1',
         'routes' => [
             [
-                'pattern' => '/user',
-                'method'  => Method::POST,
-                'handler'  => [UserController::class, 'login'],
-                'name' => 'user.login',
-            ],
-            [
-                'pattern' => '/user/register',
-                'method'  => Method::POST,
-                'handler'  => [UserController::class, 'register'],
-                'name' => 'user.register',
+                'prefix' => '/user',
+                'routes' => [
+                    [
+                        'pattern' => '/login',
+                        'method'  => Method::POST,
+                        'handler'  => [UserController::class, 'login'],
+                        'name' => 'user.login',
+                    ],
+                    [
+                        'pattern' => '/user/register',
+                        'method'  => Method::POST,
+                        'handler'  => [UserController::class, 'register'],
+                        'name' => 'user.register',
+                    ],
+                    [
+                        'pattern' => '/me',
+                        'method'  => Method::GET,
+                        'handler'  => [UserController::class, 'me'],
+                        'name' => 'user.me',
+                    ],
+                ],
             ],
             [
                 'prefix' => '/product',

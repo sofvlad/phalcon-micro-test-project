@@ -6,14 +6,15 @@ namespace App\Controllers;
 
 use App\Models\User;
 use App\Repositories\UserRepository;
+use Core\AbstractController;
 use Core\Exceptions\EntityNotFoundException;
 use Core\Exceptions\Exception;
+use Core\Exceptions\UnauthorizedException;
 use Phalcon\Encryption\Security\JWT\Exceptions\UnsupportedAlgorithmException;
 use Phalcon\Encryption\Security\JWT\Exceptions\ValidatorException;
 use Phalcon\Http\ResponseInterface;
-use Phalcon\Mvc\Controller;
 
-class UserController extends Controller
+class UserController extends AbstractController
 {
     /**
      * @throws EntityNotFoundException
@@ -42,5 +43,15 @@ class UserController extends Controller
         $user->save();
 
         return $this->response->setJsonContent([]);
+    }
+
+    /**
+     * @throws UnsupportedAlgorithmException
+     * @throws UnauthorizedException
+     * @throws EntityNotFoundException
+     */
+    public function me(): ResponseInterface
+    {
+        return $this->response->setJsonContent($this->getCurrentUser());
     }
 }

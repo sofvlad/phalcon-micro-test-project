@@ -72,9 +72,4 @@ abstract class AbstractModel extends Model implements ModelInterface
             preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', substr($method, $methodStartStrLen))
         ), '_');
     }
-
-    public function setData(array $data): static
-    {
-
-    }
 }

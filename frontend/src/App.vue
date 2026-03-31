@@ -1,6 +1,8 @@
 <script>
 import { useApi } from './composables/useApi';
+import { useAuth } from './composables/useAuth';
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'App',
@@ -10,7 +12,9 @@ export default {
       loading: false,
       error: null,
       fetchData: null,
-      categories: []
+      categories: [],
+      auth: null,
+      router: null
     }
   },
   computed: {
@@ -19,6 +23,13 @@ export default {
     },
     reactiveCategories() {
       return computed(() => this.categories);
+    },
+    isAuthenticated() {
+      console.log(this.auth?.isAuthenticated);
+      return this.auth?.isAuthenticated;
+    },
+    currentUser() {
+      return this.auth?.user?.value || null;
     }
   },
   methods: {
@@ -40,6 +51,11 @@ export default {
       if (newVal?.data) {
         this.categories = newVal.data;
       }
+    },
+    async handleLogout() {
+      if (this.auth) {
+        await this.auth.logout();
+      }
     }
   },
   watch: {
@@ -58,10 +74,14 @@ export default {
     this.error = error;
     this.fetchData = fetchData;
 
+    this.auth = useAuth();
+    this.router = useRouter();
+
     this.loadCategories();
   },
   provide() {
     return {
+      auth: this.auth,
       categories: this.reactiveCategories
     }
   }
@@ -97,6 +117,26 @@ export default {
                 {{ category.name }}
               </button>
             </router-link>
+          </li>
+        </ul>
+        <hr class="my-3" />
+        <ul class="list-unstyled ps-0">
+          <li v-if="!isAuthenticated" class="mb-1">
+            <router-link to="/login" active-class="active">
+              <button class="btn btn-toggle align-items-center rounded collapsed">
+                <i class="bi bi-box-arrow-in-right"></i>
+                Вход
+              </button>
+            </router-link>
+          </li>
+          <li v-else class="mb-1">
+            <button
+                class="btn btn-toggle align-items-center rounded collapsed text-danger"
+                @click="handleLogout"
+            >
+              <i class="bi bi-box-arrow-right"></i>
+              Выход
+            </button>
           </li>
         </ul>
       </div>

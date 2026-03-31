@@ -132,7 +132,11 @@ class User extends AbstractModel
     protected function preSave(MetaDataInterface $metaData, bool $exists, $identityField): bool
     {
         if (parent::preSave($metaData, $exists, $identityField)) {
-            $this->password = new Security()->hash($this->password);
+            $security = new Security();
+            $hashInfo = $security->getHashInformation($this->password);
+            if (empty($hashInfo['algo'])) {
+                $this->password = $security->hash($this->password);
+            }
 
             return true;
         }
