@@ -3,6 +3,9 @@ import { useApi } from './composables/useApi';
 import { useAuth } from './composables/useAuth';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 export default {
   name: 'App',
@@ -65,6 +68,14 @@ export default {
       },
       deep: true,
       immediate: true
+    },
+    'auth.isAuthenticated': {
+      handler(newVal) {
+        console.log(newVal);
+        if (newVal) {
+          this.auth.fetchCurrentUser();
+        }
+      }
     }
   },
   created() {
