@@ -29,13 +29,13 @@ export default {
       }
     }
   },
-  watch: {'isAuthenticated': {
+  watch: {
+    'isAuthenticated': {
       handler(newVal) {
         if (newVal) {
           this.router.push('/');
         }
-      },
-      immediate: true
+      }
     },
     'formData.email'(newVal) {
       this.errors.email = this.validateEmail(newVal);
@@ -117,7 +117,10 @@ export default {
                       class="btn btn-outline-secondary"
                       @click="showPassword = !showPassword"
                   >
-                    {{ showPassword ? '🙈' : '👁️' }}
+                    <span>
+                      <i v-if="showPassword" class="bi bi-eye-slash-fill"></i>
+                      <i v-else class="bi bi-eye-fill"></i>
+                    </span>
                   </button>
                 </div>
                 <div v-if="errors.password" class="invalid-feedback d-block">

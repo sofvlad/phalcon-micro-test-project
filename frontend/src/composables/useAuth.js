@@ -1,37 +1,36 @@
-import { useLocalStorage } from '@vueuse/core'
+import { StorageSerializers, useLocalStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { useApi } from './useApi'
 
 export function useAuth() {
     const { fetchData, loading } = useApi();
 
-    const user = useLocalStorage('auth_user', null);
+    const user = useLocalStorage('auth_user', null, { serializer: StorageSerializers.object });
     const token = useLocalStorage('auth_token', null);
 
     const isAuthenticated = computed(() => {
-        return !!token.value && !!user.value;
+        return !!token.value;
     });
 
     const login = async (email, password) => {
-        const result = await fetchData('/user/login', 'POST', { email, password });
-
-        if (result.success) {
-            const responseData = result.data;
-            token.value = responseData?.data.token;
-            user.value = await fetchData('/user/me');
-
-            return { success: true };
+        if (token.value) {
+            return null;
         }
 
-        return { success: false, error: result.error };
+        const result = await fetchData('/user/login', 'POST', { email, password });
+        if (!result.success) {
+            return { success: false, error: result.error };
+        }
+        token.value = result?.data.data.token;
+
+        return { success: true };
     }
 
     const register = async (email, password) => {
         const result = await fetchData('/user/register', 'POST', { email, password });
 
         if (result.success) {
-            token.value = result.data.token;
-            user.value = result.data.user;
+            token.value = result?.data.data.token;
 
             return { success: true };
         }
@@ -49,17 +48,24 @@ export function useAuth() {
     }
 
     const fetchCurrentUser = async () => {
-        if (!token.value) return null
-
-        const result = await fetchData('/user/me', 'GET');
-
-        if (result.success) {
-            user.value = result.data;
-
-            return result.data;
+        if (user.value) {
+            return user.value;
+        }
+        if (!token.value) {
+            return null;
         }
 
-        return null;
+        const result = await fetchData('/user/me', 'GET', null, {
+            'Authorization': `Bearer ${token.value}`,
+        });
+        const responseData = result.data;
+
+        if (!result.success) {
+            return null;
+        }
+        user.value = responseData.data;
+
+        return user.value;
     }
 
     return {

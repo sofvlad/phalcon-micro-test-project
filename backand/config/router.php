@@ -19,7 +19,7 @@ return [
                         'name' => 'user.login',
                     ],
                     [
-                        'pattern' => '/user/register',
+                        'pattern' => '/register',
                         'method'  => Method::POST,
                         'handler'  => [UserController::class, 'register'],
                         'name' => 'user.register',

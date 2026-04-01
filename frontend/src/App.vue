@@ -14,6 +14,7 @@ export default {
       fetchData: null,
       categories: [],
       auth: null,
+      user: null,
       router: null
     }
   },
@@ -25,11 +26,10 @@ export default {
       return computed(() => this.categories);
     },
     isAuthenticated() {
-      console.log(this.auth?.isAuthenticated);
       return this.auth?.isAuthenticated;
     },
     currentUser() {
-      return this.auth?.user?.value || null;
+      return this.auth?.user;
     }
   },
   methods: {
@@ -78,6 +78,7 @@ export default {
     this.router = useRouter();
 
     this.loadCategories();
+    this.auth.fetchCurrentUser();
   },
   provide() {
     return {
@@ -120,6 +121,7 @@ export default {
           </li>
         </ul>
         <hr class="my-3" />
+        <p v-if="isAuthenticated && currentUser" class="ms-2 mb-0">{{ currentUser?.email }}</p>
         <ul class="list-unstyled ps-0">
           <li v-if="!isAuthenticated" class="mb-1">
             <router-link to="/login" active-class="active">

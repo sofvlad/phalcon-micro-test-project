@@ -43,19 +43,26 @@ export default {
       this.route = useRoute();
       this.router = useRouter();
     },
-    handlePageChange(page = 1) {
+    refresh() {
       if (this.route?.params?.code) {
         this.router.push({
           name: 'category_products',
           params: this.route.params,
-          query: { page: page }
+          query: { page: this.currentPage }
         });
       } else {
         this.router.push({
           name: 'all_products',
-          query: { page: page }
+          query: { page: this.currentPage }
         });
       }
+    },
+    handlePageChange(page = 1) {
+      this.currentPage = page;
+      this.refresh();
+    },
+    handleProductDeleted(productId) {
+      this.fetchProductList(this.route?.params?.code, this.currentPage);
     },
     async fetchProductList(code = null, page = 1) {
       if (!this.fetchData) return;
@@ -156,7 +163,7 @@ export default {
         class="col-sm-3"
     >
       <div class="card h-100">
-        <ProductCard :product="product" />
+        <ProductCard :product="product" @deleted="handleProductDeleted" />
       </div>
     </div>
   </div>

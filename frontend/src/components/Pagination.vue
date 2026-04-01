@@ -81,3 +81,10 @@ export default {
     </ul>
   </nav>
 </template>
+
+<style>
+.page-item-space:hover a {
+  cursor: default;
+  background-color: var(--bs-pagination-bg);
+}
+</style>
